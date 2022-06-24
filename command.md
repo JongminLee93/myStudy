@@ -14,3 +14,4 @@ ex) ls -1 | wc -l : 현재 폴더의 파일 목록을 한줄씩 출력한 것을
 - sync
 - rsync
 - crontab : 윈도우의 스케줄러
+- su -[user] : user로 사용자 변경
