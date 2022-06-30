@@ -1,7 +1,7 @@
 # myStudy
 
 ## Git
- - [Git](./git/git.md)
+ - [Git](./git)
  
 ## Java
  ### Stream
