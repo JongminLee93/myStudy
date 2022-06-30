@@ -3,12 +3,13 @@
  - [Git](https://git-scm.com/doc)
 
  ## 명령어 모음
+ - status
+ - log
  - add
  - commit
  - checkout
  - branch
- - status
- - log
+ - [merge](./command/merge.md)
  - reset
  - revert
 
