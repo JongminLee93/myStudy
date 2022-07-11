@@ -3,4 +3,4 @@
 
 ## Command
 
-- [mkdir](./mkdir.md) : 디렉토리 생성
+- [mkdir](./Command/mkdir.md) : 디렉토리 생성
