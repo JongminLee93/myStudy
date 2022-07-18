@@ -9,9 +9,9 @@ ex) ls -1 | wc -l : 현재 폴더의 파일 목록을 한줄씩 출력한 것을
 
 - [mkdir](./mkdir.md) : 디렉토리 생성
 
+- [sed](./sed.md) : 파일 내용 필터링
+
 - wget : 
-- sed : 파일들의 내용 변경
-  - -i
 
 - sync
 - rsync
