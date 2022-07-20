@@ -19,8 +19,18 @@
 
 ## Linux
 
-- Command
+- Shell
+
+	- [if문](./Linux/If.md)
+
+- [Command](./Linux/Command/README.md)
+
 
 ## Ncl
 
 
+## JavaScript
+
+- React
+
+	- [props](./JavaScript/React/props.md)

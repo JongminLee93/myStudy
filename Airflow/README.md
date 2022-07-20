@@ -1,0 +1,47 @@
+# Airflow
+
+- batch-oriented framework for building data pipelines
+
+### What is data pipelines?
+
+- Data pipelines consist of several tasks or actions that need to be excuted to acieve the desired result
+
+- 기상 정보를 내 게시판에 게시하고 싶다면?
+
+	1. Fetch weather forcast data from a weather API
+
+	2. Clean or transform the fetched data, so that the data suits our purpose
+
+	3. Push the transformed data to the weather dashboard
+
+- 위의 작업 내용을 그림으로 표현하면 다음과 같다.
+
+![Data Pipelines with Apache Airflow - fig 1.2](./image/fig_1_2.PNG)
+
+- 위 그림을 directed acyclic graph, 줄여서 DAG라 부른다. 
+
+- 화살표는 각 작업간의 의존성을 의미한다. 예를 들어 clean forecast data 하기 전에 fetch weather forecast 작업이 완료되야 한다. 
+
+- 그냥 순서대로 쓰면 되는거 아니야?
+
+	- 그래프로 그리는 경우 여러 개의 독립적인 작업들의 비의존성이 명확하게 보임
+
+	- 날씨 예보와 우산 판매량 사이의 상관관계를 머신 러닝에 접목시킨다고 가정하면
+
+		1. 날씨에 따른 우산 판매량 데이터 준비
+		
+		2. 날씨 예보 데이터 준비
+
+		3. 두 데이터셋을 조합하여 머신 러닝 모델의 input 데이터로 가공
+
+		4. 머신 러닝
+
+		5. 사업에 적용
+
+	- 과 같은 순서를 따르게 될 것.
+
+	- 이를 그림으로 표현하면
+
+	![Data Pipelines with Apache Airflow - fig 1.6](./image/fig_1_6.PNG)
+
+	- 위의 순서 보다는 판매 데이터와 예보 데이터의 비의존성이 두드러지기 때문에 최적화하는데 더 효율적
