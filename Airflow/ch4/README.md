@@ -30,4 +30,6 @@
 
     <img src="../image/fig_4_3.PNG" width="600px" />
 
-## [4.2 Task context and Jinja templting](./4.2_Task_context_and_Jinja_templating.md)
+### [4.2 Task context and Jinja templting](./4.2_Task_context_and_Jinja_templating.md)
+
+### [4.3 Hooking up other systems](./4.3_Hooking_up_other_systems.md)
