@@ -16,3 +16,5 @@
 	```
 
 - Options
+
+	- -d[date] (--date) : 명령 실행 시점이 아닌 [date]에 명시한 시점을 기준으로 formatting하여 표출
