@@ -35,7 +35,9 @@ $ airflow info
 Paths info
 airflow_home    | /opt/airflow
 system_path     | /root/bin:/home/airflow/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-python_path     | /home/airflow/.local/bin:/usr/local/lib/python37.zip:/usr/local/lib/python3.7:/usr/local/lib/python3.7/lib-dynload:/home/airflow/.local/lib/python3.7/site-packages:/usr/local/lib/python3.7/site-packages:/opt/airflow/dags:/opt/airflow/config:/opt/airflow/plugins
+python_path     | /home/airflow/.local/bin:/usr/local/lib/python37.zip:/usr/local/lib/python3.7:/usr/local/lib/python3.7/lib-dynload
+                | :/home/airflow/.local/lib/python3.7/site-packages:/usr/local/lib/python3.7/site-packages:/opt/airflow/dags
+                | :/opt/airflow/config:/opt/airflow/plugins
 airflow_on_path | True
 ...
 ```
@@ -43,21 +45,26 @@ airflow_on_path | True
 
 위 경로들은 Airflow가 실행될 때 추가됨
 
+## custom python code 패키징 시 주의할 점
 
+Use unique top package name
 
-- Use unique top package name
-	- dag/common files를 구분하기 위한 서브디렉토리 명을 기타 다른 subpackage의 이름과 겹치지 않게 할 것
-	- 같은 이름을 사용하게 되면 충돌할 수 있음
-	- airflow/operators 디렉토리는 이미 airflow.operators 패키지가 존재하기 때문에 `from airflow.operators`로는 참조 불가
+- 디렉토리 명을 기타 다른 subpackage의 이름과 겹치지 않게 할 것
 
-- Don't use relative imports
-	- python 코드를 어떻게 실행하느냐에 따라 다른 결과가 발생
+- 같은 이름을 사용하게 되면 충돌할 수 있음
 
-- Add \_\_init\_\_.py in package folders
+- airflow/operators 디렉토리는 이미 airflow.operators 패키지가 존재하기 때문에 `from airflow.operators`로는 참조 불가
 
+Don't use relative imports
+
+	- python 코드를 어디서 실행하느냐에 따라 다른 결과가 발생
+
+Add \_\_init\_\_.py in package folders
 
 ## Creating a package in Python
-- 커스텀 python code를 추가하기 위한 방법
-- 일일이 코드를 추가하고 관리하는 것은 버전 관리등의 측면에서 비효율적
 
-## Git을 통해서 dags 폴더를 관리하는 방법도 있겠다.
+custom python code를 추가하기 위한 방법 중 하나
+
+일일이 코드를 추가하고 관리하는 것은 버전 관리등의 측면에서 비효율적
+
+지속적인 유지보수가 필요한 코드인 경우에는 유용할 수 있으나 그럴 필요가 없는 경우는 과할 수 있음
