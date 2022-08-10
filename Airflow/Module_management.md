@@ -57,7 +57,7 @@ Use unique top package name
 
 Don't use relative imports
 
-	- python 코드를 어디서 실행하느냐에 따라 다른 결과가 발생
+- python 코드를 어디서 실행하느냐에 따라 다른 결과가 발생
 
 Add \_\_init\_\_.py in package folders
 
