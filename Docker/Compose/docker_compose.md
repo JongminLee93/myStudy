@@ -21,4 +21,8 @@ volumes:
   logvolume01: {}
 ```
 
+version
+
+
 services: 하위에 정의된 내용이 각각의 컨테이너
+  - web: 컴포즈로 올릴 컨테이너 명
