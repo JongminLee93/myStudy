@@ -13,3 +13,5 @@
  - reset
  - revert
 
+---
+ - [ignore file mode](./Ignore_filemode.md)
