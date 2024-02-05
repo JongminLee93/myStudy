@@ -31,7 +31,7 @@ export const south_eastern: Story = {
     height: 800,
     data: seJson,
     backgroundData: background,
-    defaultScale: 10000,
-    defaultCenter: [129, 36],
+    year: 2020,
+    pollutant: 'PM10',
   },
 };
