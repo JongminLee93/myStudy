@@ -19,7 +19,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "noImplicitAny": false,
+    "sourceMap": true // generate js source map for ts files
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

@@ -6,6 +6,8 @@ import * as d3 from 'd3';
 interface optionProps {
   title: any
   tickSize?: number,
+  top?: number,
+  left?: number,
   width?: number,
   height?: number,
   marginTop?: number,
@@ -21,6 +23,8 @@ function Legend(color: any, {
   title,
   tickSize = 6,
   width = 320,
+  top = 0,
+  left = 0,
   height = 44 + tickSize,
   marginTop = 18,
   marginRight = 0,
@@ -48,9 +52,17 @@ function Legend(color: any, {
   const svg = d3.create("svg")
       .attr("width", width)
       .attr("height", height)
-      .attr("viewBox", [0, 0, width, height])
+      .attr("viewBox", [ -(left - width), -(top - height), width, height])
       .style("overflow", "visible")
       .style("display", "block");
+
+  svg.append('rect')
+    .attr('transform', `translate(-10, -5)`)
+    .attr('width', width+20)
+    .attr('height', height+10)
+    .attr('rx', 4)
+    .attr('fill', 'white')
+    .attr('fill-opacity', '0.8')
 
   let tickAdjust = (g: any) => g.selectAll(".tick line").attr("y1", marginTop + marginBottom - height);
   let x: any;
