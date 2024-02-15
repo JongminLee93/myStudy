@@ -1,4 +1,7 @@
-import { useSpring, animated } from '@react-spring/web'
+import * as d3 from 'd3';
+import { useSpring, animated } from '@react-spring/web';
+import { useEffect, useRef } from 'react';
+import { addTooltip } from '../map/component/Tooltip';
 
 type BarItemProps = {
   name: string;
@@ -26,9 +29,10 @@ export const BarItem = ({
   y,
   dimension
 }: BarItemProps) => {
-  const hasEnoughWidth = dimension.boundedWidth - barWidth > 100;
-  const dataLabelOffset = hasEnoughWidth ? 5 : -5;
-  const textAnchor = hasEnoughWidth ? 'start' : 'end';
+  const isEnoughEmptySpace = dimension.boundedWidth - barWidth > 100;
+  const isEnoughBarWidth = barWidth > 100;
+  const dataLabelOffset = isEnoughEmptySpace ? 5 : -5;
+  const textAnchor = isEnoughEmptySpace ? 'start' : 'end';
 
   const springProps = useSpring<AnimatedProps>({
     // the 'from' properties will be used only to animate the initialization of the component
@@ -41,7 +45,7 @@ export const BarItem = ({
     to: {
       value: value,
       barWidth: barWidth,
-      valueOpacity: barWidth > 80 ? 1 : 0,
+      valueOpacity: isEnoughBarWidth ? 1 : isEnoughEmptySpace ? 1 : 0,
       y: y,
     },
     config: {
@@ -59,27 +63,30 @@ export const BarItem = ({
         opacity={0.7}
         stroke="#9d174d"
         fill="#9d174d"
-        fillOpacity={0.3}
+        fillOpacity={0.7}
         strokeWidth={1}
         rx={1}
+        onMouseMove={(e) => {
+          const tooltip = d3.select('#tooltip');
+
+          // tooltip.style('opacity', 1);
+        }}
+        onMouseOut={(e) => {
+          const tooltip = d3.select('#tooltip');
+
+          // tooltip.style('opacity', 0);
+        }}
       />
       <animated.text
-        x={barWidth+100 > dimension.boundedWidth ? springProps.barWidth?.to((width) => x+width - 5) : springProps.barWidth?.to((width) => x+width + 5)}
+        x={springProps.barWidth?.to((width) => x+width + dataLabelOffset)}
         y={springProps.y?.to((y) => y + barHeight / 2)}
-        textAnchor={barWidth+100 > dimension.boundedWidth ? 'end' : 'start' }
+        textAnchor={textAnchor}
         alignmentBaseline="central"
+        opacity={springProps.valueOpacity}
         fontSize={12}
+        fontWeight='bold'
       >
         {springProps.value?.to((value) => value.toFixed(1) + ' ton')}
-      </animated.text>
-      <animated.text
-        x={x - 7}
-        y={springProps.y?.to((y) => y + barHeight / 2)}
-        textAnchor="end"
-        alignmentBaseline="central"
-        fontSize={12}
-      >
-        {name}
       </animated.text>
     </g>
   )
