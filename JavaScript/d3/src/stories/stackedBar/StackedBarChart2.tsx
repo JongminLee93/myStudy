@@ -4,6 +4,8 @@ import * as d3 from 'd3';
 import { useMemo, useRef, useState } from 'react';
 import XAxis from '../component/XAxis';
 import YAxis from '../component/YAxis';
+import { BarStack, BarStackText } from './BarStack';
+import { Tooltip } from './Tooltip';
 
 interface Data {
   name: string;
@@ -16,25 +18,26 @@ interface Props {
   xAxisLabel?: string;
   yAxisLabel?: string;
   data: Data[] | undefined;
-  selectedSource?: string;
+  selectedSources?: string[];
 }
 
 const StackedBarChart = ({
   dimension,
   xAxisLabel,
   data,
-  selectedSource,
+  selectedSources,
 }: Props) => {
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
   const [tooltipRegion, setTooltipRegion] = useState<string>('');
-  const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number; }>();
+
+  const [legendSource, setLegendSource] = useState<string>('');
 
   const regions = useMemo(() => Array.from(new Set(data?.map(d => d.name).sort())) ?? [], [data]);
   const sources = useMemo(() => Array.from(new Set(data?.map(d => d.source).sort())) ?? [], [data]);
 
+  const filteredData = useMemo(() => data?.filter(d => selectedSources?.includes(d.source)), [data, selectedSources]);
+
   const regionalData = regions?.map(name => {
-    const value = data?.filter(d => d.name === name).reduce((acc, { value }) => acc + value, 0);
+    const value = filteredData?.filter(d => d.name === name).reduce((acc, { value }) => acc + value, 0);
 
     return { name, value }
   })
@@ -44,14 +47,14 @@ const StackedBarChart = ({
       .domain([0, d3.max(regionalData, d => d.value) ?? 0])
       .rangeRound([0, dimension.boundedWidth])
       .nice()
-  ), [data, dimension.boundedWidth])
+  ), [regionalData, dimension.boundedWidth])
 
   const yScale = useMemo(() => (
     d3.scaleBand()
       .domain(regions)
       .range([0, dimension.boundedHeight])
       .padding(0.3)
-  ), [data, dimension.boundedHeight])
+  ), [regions, dimension.boundedHeight])
 
   const colors = useMemo(() => (
     d3.scaleOrdinal()
@@ -66,40 +69,59 @@ const StackedBarChart = ({
 
   const barItems = regions.map(name => {
     const y = yScale(name) ?? 0;
-    let acc = 0;
 
+    let acc = 0;
     const barStacks = sources.map(source => {
-      const value = data?.find(d => d.name === name && d.source === source)?.value ?? 0;
-      const color = colors(source);
+      const value = filteredData?.find(d => d.name === name && d.source === source)?.value ?? 0;
+      const color = `${colors(source)}`;
+
+      const stackX = xScale(acc);
+      const stackY = y;
+      const stackWidth = xScale(value);
+      const stackHeight = yScale.bandwidth();
+
       acc += value;
 
       return (
-        <g>
-          <rect
-            key={`${name}-${source}`}
-            x={xScale(acc-value)}
-            y={y}
-            width={xScale(value)}
-            height={yScale.bandwidth()}
-            fill={`${color}`}
-            opacity={!selectedSource ? 1 : selectedSource === source ? 1 : 0.6}
-            stroke={selectedSource === source ? 'black' : 'transparent'}
-            strokeWidth={1}
-            pointerEvents='none'
-          />
-          {/* <text
-            x={springProps.barWidth?.to((width) => x+width + dataLabelOffset)}
-            y={springProps.y?.to((y) => y + barHeight / 2)}
-            textAnchor={textAnchor}
-            alignmentBaseline="central"
-            opacity={springProps.valueOpacity}
-            fontSize={12}
-            fontWeight='bold'
-          >
-            {springProps.value?.to((value) => value.toFixed(1) + ' ton')}
-          </text> */}
-          
-        </g>
+        <BarStack
+          key={`${name}-${source}`}
+          x={stackX}
+          y={stackY}
+          barWidth={stackWidth}
+          barHeight={stackHeight}
+          fill={color}
+          fillOpacity={!legendSource ? 1 : legendSource === source ? 1 : 0.6}
+          stroke={legendSource === source ? 'black' : 'transparent'}
+        />
+      )
+    })
+
+    acc = 0;
+    const barStackTexts = sources.map(source => {
+      const value = filteredData?.find(d => d.name === name && d.source === source)?.value ?? 0;
+
+      const stackX = xScale(acc);
+      const stackY = y;
+      const stackWidth = xScale(value);
+      const stackHeight = yScale.bandwidth();
+
+      const textSpace = 80
+      const textOffset = 5
+      const isEnoughSpace = dimension.boundedWidth - ( stackX + stackWidth ) > textSpace
+
+      acc += value;
+
+      return (
+        <BarStackText
+          key={`barStackText-${name}-${source}`}
+          x={isEnoughSpace ? stackX + stackWidth + textOffset : stackX + stackWidth - textOffset}
+          y={stackY + stackHeight/2}
+          textAnchor={isEnoughSpace ? 'start' : 'end'}
+          fontSize={10}
+          opacity={legendSource && legendSource === source ? 1 : 0}
+        >
+          { value.toFixed(1) } ton
+        </BarStackText>
       )
     })
 
@@ -112,43 +134,29 @@ const StackedBarChart = ({
           height={yScale.step()}
           fill={tooltipRegion === name ? 'black' : 'transparent'}
           fillOpacity={tooltipRegion === name ? 0.15 : 1}
-          onMouseEnter={(e) => {
+          onMouseEnter={() => {
             setTooltipRegion(name);
           }}
-          onMouseMove={(e) => {
-            const tooltip = tooltipRef.current;
-
-            if (tooltip) {
-              let tooltipWidth = tooltip.getBoundingClientRect().width;
-              let tooltipHeight = tooltip.getBoundingClientRect().height;
-
-              const targetBox = e.currentTarget.getBoundingClientRect();
-
-              let posX = e.clientX - (targetBox.x - dimension.marginLeft) + 10;
-              let posY = e.clientY - (targetBox.y - dimension.marginTop) + y - (yScale.step() - yScale.bandwidth()) / 2 + 10;
-
-              if (posX > dimension.boundedWidth / 2) {
-                posX -= (tooltipWidth + 20);
-              }
-
-              if (posY > dimension.boundedHeight / 2) {
-                posY -= (tooltipHeight + 20);
-              }
-
-              setTooltipPosition({x: posX, y: posY});
-            }
-          }}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             setTooltipRegion('');
           }}
         />
         { barStacks }
+        { barStackTexts }
         <text
           x={xScale(acc) > dimension.boundedWidth - 100 ? xScale(acc) - 5 : xScale(acc) + 5}
           y={y + yScale.bandwidth() / 2}
           textAnchor={xScale(acc) > dimension.boundedWidth - 100 ? 'end' : 'start'}
           alignmentBaseline='central'
           fontSize={12}
+          opacity={legendSource ? 0 : 1}
+          pointerEvents='none'
+          fontWeight='bold'
+          paintOrder='stroke'
+          stroke='white'
+          strokeWidth={1.5}
+          strokeLinecap='butt'
+          strokeLinejoin='miter'
         >
           {acc.toFixed(1)} ton
         </text>
@@ -156,51 +164,39 @@ const StackedBarChart = ({
     )
   })
 
-  const tooltip = sources.map((source, i) => {
-    const value = data?.find(d => d.name === tooltipRegion && d.source === source)?.value ?? '-';
+  const legend = sources.map((source, i) => {
     const color = `${colors(source)}`;
-    const size = 10;
+    const size = 9;
+    const step = size + 5;
     const textOffset = 2;
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: i === 0 ? '' : '1px solid rgba(0, 0, 0, 0.08)',
-          padding: '1px 0'
+      <g
+        key={`legend-${source}`}
+        onMouseEnter={() => {
+          setLegendSource(source);
+        }}
+        onMouseLeave={() => {
+          setLegendSource('');
         }}
       >
-        <div
-          style={{
-            background: color,
-            width: size,
-            height: size,
-            marginRight: textOffset,
-          }}
+        <rect
+          x={0}
+          y={step * i}
+          width={size}
+          height={size}
+          fill={color}
         />
-        <div
-          style={{
-            flexGrow: 1,
-            marginRight: textOffset,
-            textAlign: 'center',
-            fontSize: size,
-          }}
+        <text
+          x={size + textOffset}
+          y={step * i}
+          alignmentBaseline='before-edge'
+          fontSize={size}
+          fontFamily='sans-serif'
         >
-          {`${source}`}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'end',
-            minWidth: 65,
-            fontSize: size,
-          }}
-        >
-          {`${value} ton`}
-        </div>
-      </div>
+          { source }
+        </text>
+      </g>
     )
   })
 
@@ -211,6 +207,7 @@ const StackedBarChart = ({
         height={dimension.height}
         viewBox={`${[0,0,dimension.width,dimension.height].join(',')}`}
         overflow='visible'
+        fontFamily='sans-serif'
       >
         <g transform={`translate(${dimension.marginLeft},0)`}>
           {/* <rect
@@ -222,7 +219,7 @@ const StackedBarChart = ({
             opacity={0.2}
           /> */}
         </g>
-        <g className='legend' transform={`translate(${dimension.marginLeft+dimension.boundedWidth},${dimension.marginTop})`}>
+        <g className='margin-right' transform={`translate(${dimension.marginLeft+dimension.boundedWidth},${dimension.marginTop})`}>
           {/* <rect
             x={0}
             y={0}
@@ -231,6 +228,9 @@ const StackedBarChart = ({
             fill='yellow'
             opacity={0.2}
           /> */}
+          {/* <g className='legend'>
+            { legend }
+          </g> */}
         </g>
         <g className='y-axis' transform={`translate(0,${dimension.marginTop})`}>
           {/* <rect
@@ -261,6 +261,10 @@ const StackedBarChart = ({
             dimension={dimension}
             grid
           />
+          {/* <g className='legend' transform={`translate`}>
+            { legend }
+
+          </g> */}
         </g>
         <g transform={`translate(${dimension.marginLeft},${dimension.marginTop})`}>
           {/* <rect
@@ -271,36 +275,17 @@ const StackedBarChart = ({
             fill='purple'
             opacity={0.1}
           /> */}
-          <g>
-            { barItems }
-          </g>
-        </g>
-        <foreignObject
-          x={tooltipPosition?.x ?? 0}
-          y={tooltipPosition?.y ?? 0}
-          width={'100%'}
-          height={'100%'}
-          overflow='visible'
-          pointerEvents='none'
-          visibility={tooltipRegion ? 'visiblity' : 'hidden'}
-        >
-          <div
-            ref={tooltipRef}
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              position: 'absolute',
-              borderStyle: 'solid',
-              borderColor: 'black',
-              borderWidth: '1px',
-              borderRadius: '2px',
-              padding: '8px',
-              fontFamily: 'sans-serif',
-              overflow: 'visible'
-            }}
+          <Tooltip
+            open={tooltipRegion ? true : false}
+            colorScale={colors}
+            data={filteredData?.filter(d => d.name === tooltipRegion)}
+            dimension={dimension}
           >
-            { tooltip }
-          </div>
-        </foreignObject>
+            <g>
+              { barItems }
+            </g>
+          </Tooltip>
+        </g>
       </svg>
     </>
   )

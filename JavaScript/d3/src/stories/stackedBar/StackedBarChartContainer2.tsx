@@ -37,12 +37,12 @@ interface Props {
   xAxisLabel?: string;
   data?: Data[];
   year?: number;
-  source?: Source;
+  selectedSources?: Source[];
 }
 
 const StackedBarChartContainer = (props: Props) => {
   const { width, height, marginLeft, marginRight, marginTop, marginBottom } = props
-  const { data, source } = props
+  const { data, xAxisLabel, selectedSources } = props
 
   const [ref, dms] = useChartDimensions({
     width,
@@ -67,14 +67,14 @@ const StackedBarChartContainer = (props: Props) => {
       .domain([0, d3.max(regionalData, d => d.value) ?? 0])
       .rangeRound([0, dms.boundedWidth])
       .nice()
-  ), [data, dms.boundedWidth])
+  ), [regionalData, dms.boundedWidth])
 
   const yScale = useMemo(() => (
     d3.scaleBand()
       .domain(regions)
       .range([0, dms.boundedHeight])
       .padding(0.3)
-  ), [data, dms.boundedHeight])
+  ), [regions, dms.boundedHeight])
 
   const colors = useMemo(() => (
     d3.scaleOrdinal()
@@ -98,7 +98,7 @@ const StackedBarChartContainer = (props: Props) => {
         outline: 'solid',
       }}
     >
-      <StackedBarChart data={data} dimension={dms} selectedSource={source} />
+      <StackedBarChart data={data} dimension={dms} selectedSources={selectedSources} xAxisLabel={xAxisLabel} />
     </div>
   )
 }
