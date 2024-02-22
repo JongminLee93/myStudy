@@ -34,7 +34,7 @@ const StackedBarChart = ({
   const regions = useMemo(() => Array.from(new Set(data?.map(d => d.name).sort())) ?? [], [data]);
   const sources = useMemo(() => Array.from(new Set(data?.map(d => d.source).sort())) ?? [], [data]);
 
-  const filteredData = useMemo(() => data?.filter(d => selectedSources?.includes(d.source)), [data, selectedSources]);
+  const filteredData = useMemo(() => data?.filter(d => selectedSources?.includes(d.source)??true), [data, selectedSources]);
 
   const regionalData = regions?.map(name => {
     const value = filteredData?.filter(d => d.name === name).reduce((acc, { value }) => acc + value, 0);
