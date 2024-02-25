@@ -55,6 +55,42 @@ const meta = {
         max: 100,
       }
     },
+    pollutant: {
+      control: {
+        type: 'select'
+      },
+      options: [
+        "CO",
+        "NOx",
+        "SOx",
+        "TSP",
+        "PM10",
+        "PM2P5",
+        "VOC",
+        "NH3",
+        "BC",
+      ]
+    },
+    selectedSources: {
+      control: {
+        type: 'multi-select',
+      },
+      options: [
+        "기타 면오염원",
+        "농업",
+        "도로이동오염원",
+        "비도로이동오염원",
+        "비산먼지",
+        "비산업 연소",
+        "생물성 연소",
+        "생산공정",
+        "에너지산업 연소",
+        "에너지수송 및 저장",
+        "유기용제 사용",
+        "제조업 연소",
+        "폐기물처리"
+      ]
+    }
   }
   // More on argTypes: https://storybook.js.org/docs/api/argtypes
 } satisfies Meta<typeof StackedBarChartContainer>;
@@ -62,52 +98,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-interface Data {
-  name: string;
-  source: string;
-  value: number;
-}
-
-const refineData = (data: any, pollutant: string): Data[] | undefined => {
-  if (data === undefined)
-    return undefined
-
-  let refinedData = data.reduce((acc: any[], item: any) => {
-    const { sido, sigungu, source_main, key, ...rest } = item;
-    const value = rest[pollutant];
-
-    if (sigungu) {
-      if (!acc.some(i => i.name === sigungu && i.source === source_main)) {
-        acc.push({
-          name: sigungu,
-          source: source_main,
-          value: 0,
-        })
-      }
-
-      acc.find(i => i.name === sigungu && i.source === source_main)['value'] += value;
-
-      return acc;
-    }
-
-    if (!acc.some(i => i.name === sido && i.source === source_main)) {
-      acc.push({
-        name: sido,
-        source: source_main,
-        value: 0,
-      })
-    }
-
-    acc.find(i => i.name === sido && i.source === source_main)['value'] += value;
-
-    return acc;
-
-  }, [])
-
-  return refinedData.sort(((a: any, b: any) => a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
-}
-
-const data = refineData(require('/public/data/capss/Busan-pm10.json'), 'PM10');
+const data = require('/public/data/capss/Busan-pm10.json');
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
@@ -118,7 +109,23 @@ export const Default: Story = {
     marginRight: 0,
     marginTop: 0,
     marginBottom: 0,
-    source: '기타 면오염원',
+    pollutant: 'PM10',
+    xAxisLabel: '연간 배출량 (ton)',
+    data: data,
+  },
+};
+
+export const SourceSelected: Story = {
+  args: {
+    width: 500,
+    height: 200,
+    marginLeft: 0,
+    marginRight: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    pollutant: 'PM10',
+    selectedSources: ['생물성 연소'],
+    xAxisLabel: '연간 배출량 (ton)',
     data: data,
   },
 };

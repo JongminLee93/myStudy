@@ -1,33 +1,39 @@
-import { useMemo } from 'react'
+import { G } from '@/stories/component/animated/G';
+import { toSIUnit } from '@/stories/util/formatter';
 import * as d3 from 'd3';
+import { useMemo } from 'react';
 
 type Props = {
   xScale: d3.ScaleLinear<number, number, never>;
+  tickSize?: number;
+  tickFontSize?: string | number;
   tickOffset?: number;
   grid?: boolean;
   label?: string;
+  labelFontSize?: string | number;
   labelOffset?: number;
   dimension: any;
 }
 
 const XAxis = ({
   xScale,
-  tickOffset=20,
+  tickSize=6,
+  tickFontSize=10,
+  tickOffset=18,
   grid=false,
   label,
+  labelFontSize=11,
   labelOffset=25,
   dimension,
 }: Props) => {
   const ticks = useMemo(() => {
     const pixelsPerTick = 60
-    const numberOfTicksTarget = Math.max(
+    const numOfTicks = Math.max(
       1,
-      Math.floor(
-        dimension.boundedWidth / pixelsPerTick
-      )
+      Math.floor(dimension.boundedWidth / pixelsPerTick)
     )
 
-    return xScale.ticks(numberOfTicksTarget)
+    return xScale.ticks(numOfTicks)
       .map(value => ({
         value,
         xOffset: xScale(value)
@@ -40,41 +46,44 @@ const XAxis = ({
     >
       <path
         d={[
-          "M", 0, 6,
-          "v", -6,
+          "M", 0, tickSize,
+          "v", -tickSize,
           "H", dimension.boundedWidth,
-          "v", 6,
+          "v", tickSize,
         ].join(" ")}
         fill="none"
         stroke="currentColor"
       />
-      {ticks.map(({ value, xOffset }) => (
-        <g
+      {ticks.map(({ value, xOffset }, i) => (
+        <G
           key={value}
           transform={`translate(${xOffset}, 0)`}
+          opacity={1}
         >
           {
             grid &&
             <line
               y2={-dimension.boundedHeight}
               stroke="#ddd"
+              strokeDasharray={i === 0 ? 0 : 4}
+              strokeOpacity={0.8}
             />
           }
           <line
-            y2="6"
+            y2={tickSize}
             stroke="currentColor"
           />
           <text
-            fontSize={10}
-            textAnchor='middle'
             y={tickOffset}
+            fontSize={tickFontSize}
+            textAnchor='middle'
           >
             { toSIUnit(value) }
           </text>
-        </g>
+        </G>
       ))}
       <text
-        fontSize={11}
+        fontSize={labelFontSize}
         fontWeight='bold'
         textAnchor='middle'
         alignmentBaseline='hanging'
@@ -85,17 +94,5 @@ const XAxis = ({
     </svg>
   )
 }
-
-const toSIUnit = (value: number) => {
-  const to = 1;
-  if (value < 1e3) return value.toString();
-  else if (value >= 1e3 && value < 1e6) return (value / 1e3).toFixed(to) + 'K';
-  else if (value >= 1e6 && value < 1e9) return (value / 1e6).toFixed(to) + 'M';
-  else if (value >= 1e9 && value < 1e12) return (value / 1e9).toFixed(to) + 'G';
-  else if (value >= 1e12 && value < 1e15) return (value / 1e12).toFixed(to) + 'T';
-  else if (value >= 1e15 && value < 1e18) return (value / 1e15).toFixed(to) + 'P';
-  else return value.toString(); // 값을 그대로 반환
-}
-
 
 export default XAxis

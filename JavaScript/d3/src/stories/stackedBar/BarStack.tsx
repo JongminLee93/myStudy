@@ -1,3 +1,4 @@
+import { Rect } from '@/stories/component/animated';
 import { ReactNode } from 'react';
 
 interface Props {
@@ -22,7 +23,7 @@ export const BarStack = ({
 
   return (
     <g pointerEvents='none'>
-      <rect
+      <Rect
         x={x}
         y={y}
         width={barWidth}

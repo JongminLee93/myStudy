@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import StackedBarChartContainer from './StackedBarChartContainer2';
+import StackedBarChartContainer from './StackedBarChartContainer';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: 'd3/bar/stacked bar chart custom',
+  title: 'd3/bar/d3-stack',
   component: StackedBarChartContainer,
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
@@ -55,26 +55,6 @@ const meta = {
         max: 100,
       }
     },
-    selectedSources: {
-      control: {
-        type: 'multi-select',
-      },
-      options: [
-        "기타 면오염원",
-        "농업",
-        "도로이동오염원",
-        "비도로이동오염원",
-        "비산먼지",
-        "비산업 연소",
-        "생물성 연소",
-        "생산공정",
-        "에너지산업 연소",
-        "에너지수송 및 저장",
-        "유기용제 사용",
-        "제조업 연소",
-        "폐기물처리"
-      ]
-    }
   }
   // More on argTypes: https://storybook.js.org/docs/api/argtypes
 } satisfies Meta<typeof StackedBarChartContainer>;
@@ -127,7 +107,7 @@ const refineData = (data: any, pollutant: string): Data[] | undefined => {
   return refinedData.sort(((a: any, b: any) => a.name > b.name ? 1 : a.name < b.name ? -1 : 0))
 }
 
-const data = refineData(require('/public/data/capss/ulsan-pm10.json'), 'PM10');
+const data = refineData(require('/public/data/capss/Busan-pm10.json'), 'PM10');
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
@@ -138,21 +118,7 @@ export const Default: Story = {
     marginRight: 0,
     marginTop: 0,
     marginBottom: 0,
+    source: '기타 면오염원',
     data: data,
-    xAxisLabel: '연간 배출량 (ton)'
-  },
-};
-
-export const SourceSelected: Story = {
-  args: {
-    width: 500,
-    height: 200,
-    marginLeft: 0,
-    marginRight: 0,
-    marginTop: 0,
-    marginBottom: 0,
-    selectedSources: ['생물성 연소'],
-    data: data,
-    xAxisLabel: '연간 배출량 (ton)'
   },
 };

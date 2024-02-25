@@ -1,4 +1,4 @@
-import { useChartDimensions } from '../component/hook/useChartDimensions';
+import { useChartDimensions } from '../../component/hook/useChartDimensions';
 
 import StackedBarChart from './StackedBarChart';
 
@@ -8,8 +8,7 @@ interface Data {
   value: number;
 }
 
-type Source =
-  "에너지산업 연소" |
+type Source = "에너지산업 연소" |
   "비산업 연소" |
   "제조업 연소" |
   "생산공정" |
@@ -31,15 +30,15 @@ interface Props {
   marginRight?: number;
   marginTop?: number;
   marginBottom?: number;
-  data?: Record<string, string | number>[];
-  pollutant: string;
-  selectedSources?: Source[];
   xAxisLabel?: string;
+  year?: number;
+  source?: Source;
+  data?: Data[];
 }
 
 const StackedBarChartContainer = (props: Props) => {
   const { width, height, marginLeft, marginRight, marginTop, marginBottom } = props
-  const { data, xAxisLabel, selectedSources, pollutant } = props
+  const { data, source } = props
 
   const [ref, dms] = useChartDimensions({
     width,
@@ -57,21 +56,11 @@ const StackedBarChartContainer = (props: Props) => {
       style={{
         width,
         height,
-        outline: 'solid',
+        position: 'relative',
+        // background: '#f0f0f0',
       }}
     >
-      {
-        data &&
-        <StackedBarChart
-          data={data}
-          x={pollutant}
-          y={Object.keys(data.length > 0 ? data[0] : []).includes('sigungu') ? 'sigungu' : 'sido'}
-          stack={'source_main'}
-          stackOnly={selectedSources}
-          dimension={dms}
-          xAxisLabel={xAxisLabel}
-        />
-      }
+      <StackedBarChart data={data} dimension={dms} selectedSource={source} />
     </div>
   )
 }
