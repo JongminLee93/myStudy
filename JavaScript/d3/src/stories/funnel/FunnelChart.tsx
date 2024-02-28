@@ -81,7 +81,7 @@ const FunnelChart = ({
       .range(d3.range(yDomain.length).map(
         d3.scaleSequential()
           .domain([yDomain.length - 1, 0])
-          .interpolator(d3.interpolateRgb('rgb(194, 217, 236)', 'rgb(34, 113, 180)'))
+          .interpolator(d3.interpolateRgb('#d4d6eb', '#000887'))
       ))
       .unknown('#ccc')
   ), [yDomain])

@@ -2,30 +2,25 @@ import * as d3 from 'd3';
 import { CSSProperties, ReactNode, useRef, useState } from 'react';
 
 interface TooltipProps {
+  open?: boolean;
   tooltipContent: ReactNode;
   dimension: any;
   children: ReactNode;
 }
 
 export const Tooltip = ({
+  open,
   tooltipContent,
   dimension,
   children,
 }: TooltipProps) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const [open, setOpen] = useState<boolean>(false);
   const [position, setPosition] = useState<{ x: number; y: number; }>();
 
   return (
     <>
       <g
-        onMouseEnter={() => {
-          setOpen(true);
-        }}
-        onMouseLeave={() => {
-          setOpen(false);
-        }}
         onMouseMove={(e) => {
           const tooltip = tooltipRef.current;
 

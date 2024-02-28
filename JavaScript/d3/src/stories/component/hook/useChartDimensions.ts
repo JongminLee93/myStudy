@@ -24,10 +24,10 @@ interface Dimesion {
 const combineChartDimensions = (dimensions: DimensionConfig) => {
   const parsedDimensions = {
     ...dimensions,
-    marginLeft: dimensions.marginLeft || 75,
-    marginRight: dimensions.marginRight || 10,
-    marginTop: dimensions.marginTop || 10,
-    marginBottom: dimensions.marginBottom || 50,
+    marginLeft: dimensions.marginLeft ?? 75,
+    marginRight: dimensions.marginRight ?? 10,
+    marginTop: dimensions.marginTop ?? 10,
+    marginBottom: dimensions.marginBottom ?? 50,
   }
 
   return {

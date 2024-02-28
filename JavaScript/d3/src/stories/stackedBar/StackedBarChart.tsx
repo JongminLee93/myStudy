@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent } from '@/stories/component/Tooltip';
 
 interface Props {
   dimension: any;
+  title?: string;
   xAxisLabel?: string;
   yAxisLabel?: string;
   data?: Record<string, string | number>[];
@@ -21,6 +22,7 @@ interface Props {
 
 const StackedBarChart = ({
   dimension,
+  title: titleText = 'chart',
   xAxisLabel,
   data,
   x,
@@ -180,6 +182,64 @@ const StackedBarChart = ({
     )
   })
 
+  const title = () => {
+    return (
+      <g>
+        <foreignObject
+          width={dimension.width}
+          height={dimension.marginTop}
+          // overflow='visible'
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                fontSize: 12,
+                fontWeight: 'bold',
+              }}
+            >
+              { titleText }
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                paddingInline: 10
+              }}
+            >
+              {
+                stackDomain.map(stackValue => (
+                  <div
+                    style={{
+                      background: `${colorScale(stackValue)}`,
+                      color: setLegendTextColor(`${colorScale(stackValue)}`),
+                      marginTop: 4,
+                      fontSize: 8,
+                      paddingInline: 3,
+                      borderRadius: 2,
+                      marginRight: 3
+                    }}
+                  >
+                    { stackValue }
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </foreignObject>
+      </g>
+    )
+  }
+
   // const legend = stackValues.map((stackValue, i) => {
   //   const color = `${colorScale(stackValue)}`;
   //   const size = 9;
@@ -240,6 +300,7 @@ const StackedBarChart = ({
         overflow='visible'
         fontFamily='sans-serif'
       >
+        { title() }
         <g transform={`translate(${dimension.marginLeft},0)`}>
           {/* <rect
             x={0}
@@ -249,6 +310,7 @@ const StackedBarChart = ({
             fill='green'
             opacity={0.2}
           /> */}
+          
         </g>
         <g className='margin-right' transform={`translate(${dimension.marginLeft+dimension.boundedWidth},${dimension.marginTop})`}>
           {/* <rect
@@ -304,6 +366,7 @@ const StackedBarChart = ({
             opacity={0.1}
           /> */}
           <Tooltip
+            open={hoveredY ? true : false}
             dimension={dimension}
             tooltipContent={tooltip}
           >
@@ -315,6 +378,23 @@ const StackedBarChart = ({
       </svg>
     </>
   )
+}
+
+function setLegendTextColor(bgColor) {
+  // 배경색에서 RGB 부분만 추출합니다.
+  var rgb = bgColor.match(/\d+/g);
+
+  if (rgb.length >= 3) {
+      // RGB 값을 추출하고 밝기를 계산합니다.
+      var brightness = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+
+    // 밝기에 따라 글자 색을 변경합니다.
+    if (brightness > 210) { // 128은 임계값으로 조정할 수 있습니다.
+      return 'rgba(120, 120, 120, 0.7)';
+    } else {
+      return 'white';
+    }
+  }
 }
 
 export default StackedBarChart;
