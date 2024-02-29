@@ -1,12 +1,11 @@
-'use client'
-
 import * as d3 from 'd3';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import XAxis from '../component/XAxis';
 import YAxis from '../component/YAxis';
-import { BarStack, BarStackText } from './BarStack';
-import { Text } from '@/stories/component/animated';
+import { Rect, Text } from '@/stories/component/animated';
 import { Tooltip, TooltipContent } from '@/stories/component/Tooltip';
+
+import { Title } from '@/stories/component';
 
 interface Props {
   dimension: any;
@@ -30,6 +29,8 @@ const StackedBarChart = ({
   stack,
   stackOnly,
 }: Props) => {
+  const canvas = useRef<HTMLCanvasElement>(null);
+
   const [hoveredY, setHoveredY] = useState<string>('');
 
   const [legendSource, setLegendSource] = useState<string>('');
@@ -100,48 +101,55 @@ const StackedBarChart = ({
       acc += x;
 
       return (
-        <BarStack
+        <Rect
           key={`${yValue}-${stackValue}`}
           x={stackX}
           y={stackY}
-          barWidth={stackWidth}
-          barHeight={stackHeight}
+          width={stackWidth}
+          height={stackHeight}
           fill={color}
           fillOpacity={!legendSource ? 1 : legendSource === stackValue ? 1 : 0.6}
           stroke={legendSource === stackValue ? 'black' : color}
+          strokeWidth={1}
+          pointerEvents='none'
         />
       )
     })
 
     // for legend
-    // acc = 0;
-    // const barStackTexts = stackValues.map(stackValue => {
-    //   const x = filteredData?.find(d => d.y === yValue && d.stack === stackValue)?.x ?? 0;
+    acc = 0;
+    const barStackTexts = stackDomain.map(stackValue => {
+      const x = filteredData?.find(d => d.y === yValue && d.stack === stackValue)?.x ?? 0;
 
-    //   const stackX = xScale(acc);
-    //   const stackY = y;
-    //   const stackWidth = xScale(x);
-    //   const stackHeight = yScale.bandwidth();
+      const stackX = xScale(acc);
+      const stackY = y;
+      const stackWidth = xScale(x);
+      const stackHeight = yScale.bandwidth();
 
-    //   const textSpace = 80
-    //   const textOffset = 5
-    //   const isEnoughSpace = dimension.boundedWidth - ( stackX + stackWidth ) > textSpace
+      const textSpace = 80
+      const textOffset = 5
+      const isEnoughSpace = dimension.boundedWidth - ( stackX + stackWidth ) > textSpace
 
-    //   acc += x;
+      acc += x;
 
-    //   return (
-    //     <BarStackText
-    //       key={`barStackText-${yValue}-${stackValue}`}
-    //       x={isEnoughSpace ? stackX + stackWidth + textOffset : stackX + stackWidth - textOffset}
-    //       y={stackY + stackHeight/2}
-    //       textAnchor={isEnoughSpace ? 'start' : 'end'}
-    //       fontSize={10}
-    //       opacity={legendSource && legendSource === stackValue ? 1 : 0}
-    //     >
-    //       { Math.round(x * 10) / 10 } ton
-    //     </BarStackText>
-    //   )
-    // })
+      return (
+        <Text
+          key={`barStackText-${yValue}-${stackValue}`}
+          value={x}
+          formatter={v => `${ Math.round(x * 10) / 10 } ton`}
+          x={isEnoughSpace ? stackX + stackWidth + textOffset : stackX + stackWidth - textOffset}
+          y={stackY + stackHeight / 2}
+          opacity={legendSource && legendSource === stackValue ? 1 : 0}
+          textAnchor={isEnoughSpace ? 'start' : 'end'}
+          alignmentBaseline='central'
+          fontSize={dimension.boundedWidth > 300 ? 10 : 8}
+          fontWeight='bold'
+          stroke='white'
+          paintOrder='stroke'
+          pointerEvents='none'
+        />
+      )
+    })
 
     return (
       <g key={yValue}>
@@ -160,121 +168,78 @@ const StackedBarChart = ({
           }}
         />
         { barStacks }
-        {/* { barStackTexts } */}
+        { barStackTexts }
         <Text
           value={acc}
           formatter={(v) => `${typeof v === 'number' ? Math.round(v * 10) / 10 : v} ton`}
-          x={xScale(acc) > dimension.boundedWidth - 100 ? xScale(acc) - 5 : xScale(acc) + 5}
+          x={xScale(acc) > dimension.boundedWidth - 80 ? xScale(acc) - 5 : xScale(acc) + 5}
           y={y + yScale.bandwidth() / 2}
-          textAnchor={xScale(acc) > dimension.boundedWidth - 100 ? 'end' : 'start'}
+          textAnchor={xScale(acc) > dimension.boundedWidth - 80 ?  'end' : 'start'}
           alignmentBaseline='central'
-          fontSize={12}
+          fontSize={dimension.boundedWidth > 300 ? 12 : 10}
           opacity={legendSource ? 0 : 1}
-          pointerEvents='none'
           fontWeight='bold'
           paintOrder='stroke'
           stroke='white'
-          strokeWidth={1.5}
+          strokeWidth={dimension.boundedWidth > 300 ? 1.5 : 1}
           strokeLinecap='butt'
           strokeLinejoin='miter'
+          pointerEvents='none'
         />
       </g>
     )
   })
 
-  const title = () => {
+  const legend = stackDomain.map((stackValue, i) => {
+    const stackOn = stackOnly?.includes(stackValue) ?? true;
+
+    if (!stackOn) return null;
+
+    const color = `${colorScale(stackValue)}`;
+    const size = 8
+    const step = size + 4;
+    const textOffset = 2;
+
     return (
-      <g>
-        <foreignObject
-          width={dimension.width}
-          height={dimension.marginTop}
-          // overflow='visible'
+      <div
+        key={`legend-${stackValue}`}
+        onMouseEnter={() => {
+          setLegendSource(stackValue);
+        }}
+        onMouseLeave={() => {
+          setLegendSource('');
+        }}
+        style={{
+          display: 'flex',
+          flexWrap: 'nowrap',
+          alignItems: 'center',
+          cursor: 'default',
+          pointerEvents: stackOn ? 'auto' : 'none',
+        }}
+      >
+        <i
+          style={{
+            flexShrink: 0,
+            background: stackOn ? color : '#999',
+            width: size,
+            height: size,
+            marginRight: textOffset,
+          }}
+        />
+        <div
+          style={{
+            textWrap: 'nowrap',
+            flexGrow: 1,
+            color: stackOn ? '#000' : '#999',
+            fontSize: size,
+            textDecoration: stackOn ? 'none' : 'line-through'
+          }}
         >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                fontSize: 12,
-                fontWeight: 'bold',
-              }}
-            >
-              { titleText }
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                paddingInline: 10
-              }}
-            >
-              {
-                stackDomain.map(stackValue => (
-                  <div
-                    style={{
-                      background: `${colorScale(stackValue)}`,
-                      color: setLegendTextColor(`${colorScale(stackValue)}`),
-                      marginTop: 4,
-                      fontSize: 8,
-                      paddingInline: 3,
-                      borderRadius: 2,
-                      marginRight: 3
-                    }}
-                  >
-                    { stackValue }
-                  </div>
-                ))
-              }
-            </div>
-          </div>
-        </foreignObject>
-      </g>
+          { stackValue }
+        </div>
+      </div>
     )
-  }
-
-  // const legend = stackValues.map((stackValue, i) => {
-  //   const color = `${colorScale(stackValue)}`;
-  //   const size = 9;
-  //   const step = size + 5;
-  //   const textOffset = 2;
-
-  //   return (
-  //     <g
-  //       key={`legend-${stackValue}`}
-  //       onMouseEnter={() => {
-  //         setLegendSource(stackValue);
-  //       }}
-  //       onMouseLeave={() => {
-  //         setLegendSource('');
-  //       }}
-  //     >
-  //       <rect
-  //         x={0}
-  //         y={step * i}
-  //         width={size}
-  //         height={size}
-  //         fill={color}
-  //       />
-  //       <text
-  //         x={size + textOffset}
-  //         y={step * i}
-  //         alignmentBaseline='before-edge'
-  //         fontSize={size}
-  //         fontFamily='sans-serif'
-  //       >
-  //         { stackValue }
-  //       </text>
-  //     </g>
-  //   )
-  // })
+  })
 
   const tooltip = (stackOnly || stackDomain)?.map((stack, i) => {
     const x = filteredData?.filter(d => d.y === hoveredY)?.find(d => d.stack === stack)?.x ?? 0;
@@ -294,77 +259,53 @@ const StackedBarChart = ({
   return (
     <>
       <svg
+        id='stacked-bar-chart'
         width={dimension.width}
         height={dimension.height}
         viewBox={`${[0,0,dimension.width,dimension.height].join(',')}`}
-        overflow='visible'
         fontFamily='sans-serif'
       >
-        { title() }
+        <Title
+          dimension={dimension}
+          title={titleText}
+        />
         <g transform={`translate(${dimension.marginLeft},0)`}>
-          {/* <rect
-            x={0}
-            y={0}
-            width={dimension.boundedWidth}
-            height={dimension.marginTop}
-            fill='green'
-            opacity={0.2}
-          /> */}
-          
         </g>
         <g className='margin-right' transform={`translate(${dimension.marginLeft+dimension.boundedWidth},${dimension.marginTop})`}>
-          {/* <rect
-            x={0}
-            y={0}
+          <foreignObject
+            className='legend'
+            x={5}
             width={dimension.marginRight}
             height={dimension.boundedHeight}
-            fill='yellow'
-            opacity={0.2}
-          /> */}
-          {/* <g className='legend'>
-            { legend }
-          </g> */}
+          >
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}
+            >
+              { legend }
+            </div>
+          </foreignObject>
         </g>
         <g className='y-axis' transform={`translate(0,${dimension.marginTop})`}>
-          {/* <rect
-            x={0}
-            y={0}
-            width={dimension.marginLeft}
-            height={dimension.boundedHeight}
-            fill='red'
-            opacity={0.2}
-          /> */}
           <YAxis
             yScale={yScale}
             dimension={dimension}
           />
         </g>
         <g className='x-axis' transform={`translate(${dimension.marginLeft},${dimension.marginTop+dimension.boundedHeight})`}>
-          {/* <rect
-            x={0}
-            y={0}
-            width={dimension.boundedWidth}
-            height={dimension.marginBottom}
-            fill='blue'
-            opacity={0.2}
-          /> */}
           <XAxis
             xScale={xScale}
             label={xAxisLabel}
             dimension={dimension}
             grid
           />
-          {/* <AxisBottom scale={xScale} tickFormatter={(v) => toSIUnit(v)} /> */}
         </g>
         <g transform={`translate(${dimension.marginLeft},${dimension.marginTop})`}>
-          {/* <rect
-            x={0}
-            y={0}
-            width={dimension.boundedWidth}
-            height={dimension.boundedHeight}
-            fill='purple'
-            opacity={0.1}
-          /> */}
           <Tooltip
             open={hoveredY ? true : false}
             dimension={dimension}
@@ -378,23 +319,6 @@ const StackedBarChart = ({
       </svg>
     </>
   )
-}
-
-function setLegendTextColor(bgColor) {
-  // 배경색에서 RGB 부분만 추출합니다.
-  var rgb = bgColor.match(/\d+/g);
-
-  if (rgb.length >= 3) {
-      // RGB 값을 추출하고 밝기를 계산합니다.
-      var brightness = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
-
-    // 밝기에 따라 글자 색을 변경합니다.
-    if (brightness > 210) { // 128은 임계값으로 조정할 수 있습니다.
-      return 'rgba(120, 120, 120, 0.7)';
-    } else {
-      return 'white';
-    }
-  }
 }
 
 export default StackedBarChart;

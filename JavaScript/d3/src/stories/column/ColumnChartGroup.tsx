@@ -1,10 +1,10 @@
 'use client'
 
 import ColumnChart from '@/stories/column/ColumnChart';
-import { Tooltip, TooltipContent } from '@/stories/component/Tooltip';
 import { useChartDimensions } from '@/stories/component/hook/useChartDimensions';
 import * as d3 from 'd3';
 import { useMemo, useState } from 'react';
+import { Title, Tooltip, TooltipContent } from '@/stories/component';
 
 interface Props {
   data?: Record<string, string | number>[];
@@ -130,64 +130,6 @@ const ColumnChartGroup = ({
     )
   })
 
-  const title = () => {
-    return (
-      <g>
-        <foreignObject
-          width='100%'
-          height='100%'
-          // overflow='visible'
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                fontSize: 12,
-                fontWeight: 'bold',
-              }}
-            >
-              { titleText }
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                paddingInline: 10
-              }}
-            >
-              {
-                xDomain.map(xValue => (
-                  <div
-                    style={{
-                      background: `${colorScale(xValue)}`,
-                      color: setLegendTextColor(`${colorScale(xValue)}`),
-                      marginTop: 4,
-                      fontSize: 8,
-                      paddingInline: 3,
-                      borderRadius: 2,
-                      marginRight: 3
-                    }}
-                  >
-                    { xValue }
-                  </div>
-                ))
-              }
-            </div>
-          </div>
-        </foreignObject>
-      </g>
-    )
-  }
-
   const groupAxis = groupDomain.map(gValue => {
     const g = groupScale(gValue) || 0;
 
@@ -233,7 +175,6 @@ const ColumnChartGroup = ({
     )
   })
 
-
   const tooltip = rolld.filter(([k1]) => k1 === hoveredKey).sort().map(([k1, k2, v]) => {
     return (
       <TooltipContent
@@ -250,28 +191,21 @@ const ColumnChartGroup = ({
   return (
     <>
       <svg
+        id='column-group-chart'
         width={dimension.width}
         height={dimension.height}
         viewBox={`${[0,0,dimension.width,dimension.height].join(',')}`}
         overflow='visible'
         fontFamily='sans-serif'
       >
-        <g transform={`translate(${dimension.marginLeft},${dimension.marginTop})`}>
-          <Tooltip
-            open={hoveredKey ? true : false}
-            dimension={dimension}
-            tooltipContent={tooltip}
-          >
-            <g>
-              { charts }
-            </g>
-          </Tooltip>
-        </g>
+        <Title
+          dimension={dimension}
+          title={titleText}
+        />
         <g
           className='margin-top'
           transform={`translate(${dimension.marginLeft},0)`}
         >
-          { title() }
         </g>
         <g
           className='margin-right'
@@ -291,27 +225,20 @@ const ColumnChartGroup = ({
           <line x2={dms.boundedWidth} stroke='black' strokeWidth={0.8} />
           { xAxis }
         </g>
+        <g transform={`translate(${dimension.marginLeft},${dimension.marginTop})`}>
+          <Tooltip
+            open={hoveredKey ? true : false}
+            dimension={dimension}
+            tooltipContent={tooltip}
+          >
+            <g>
+              { charts }
+            </g>
+          </Tooltip>
+        </g>
       </svg>
     </>
   )
-}
-
-
-function setLegendTextColor(bgColor) {
-  // 배경색에서 RGB 부분만 추출합니다.
-  var rgb = bgColor.match(/\d+/g);
-
-  if (rgb.length >= 3) {
-      // RGB 값을 추출하고 밝기를 계산합니다.
-      var brightness = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
-
-    // 밝기에 따라 글자 색을 변경합니다.
-    if (brightness > 210) { // 128은 임계값으로 조정할 수 있습니다.
-      return 'rgba(120, 120, 120, 0.7)';
-    } else {
-      return 'white';
-    }
-  }
 }
 
 export default ColumnChartGroup;

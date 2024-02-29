@@ -1,12 +1,9 @@
 'use client'
 
-import { Tooltip, TooltipContent } from '@/stories/component/Tooltip';
-import { G, Rect, Text } from '@/stories/component/animated';
-import * as d3 from 'd3';
-import { useMemo, useState } from 'react';
-import YAxis from '../component/YAxis';
-import { Path } from '@/stories/component/animated/Path';
+import { G, Rect } from '@/stories/component/animated';
 import { toSIUnit } from '@/stories/util/formatter';
+import * as d3 from 'd3';
+import { useMemo } from 'react';
 
 interface Props {
   data?: Record<string, string | number>[];

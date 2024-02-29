@@ -51,7 +51,7 @@ const ColumnChartGroupContainer = (props: Props) => {
         y={pollutant}
         x='source_main'
         xOnly={sources}
-        title={`${sido} 배출원별 연 ${pollutant} 배출량 (2016-2020)`}
+        title={`${sido} 배출원별 연간 ${pollutant} 배출량 (2016-2020)`}
         dimension={dms}
       />
     </div>

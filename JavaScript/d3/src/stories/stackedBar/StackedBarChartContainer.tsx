@@ -2,6 +2,8 @@ import { useChartDimensions } from '../component/hook/useChartDimensions';
 
 import StackedBarChart from './StackedBarChart';
 
+import * as svg2png from 'save-svg-as-png';
+
 interface Data {
   name: string;
   source: string;
@@ -34,12 +36,13 @@ interface Props {
   data?: Record<string, string | number>[];
   pollutant: string;
   selectedSources?: Source[];
+  title?: string;
   xAxisLabel?: string;
 }
 
 const StackedBarChartContainer = (props: Props) => {
   const { width, height, marginLeft, marginRight, marginTop, marginBottom } = props
-  const { data, xAxisLabel, selectedSources, pollutant } = props
+  const { data, title, xAxisLabel, selectedSources, pollutant } = props
 
   const [ref, dms] = useChartDimensions({
     width,
@@ -69,9 +72,15 @@ const StackedBarChartContainer = (props: Props) => {
           stack={'source_main'}
           stackOnly={selectedSources}
           dimension={dms}
+          title={title}
           xAxisLabel={xAxisLabel}
         />
       }
+      <div>
+        <button onClick={() => {
+          svg2png.saveSvgAsPng(document.getElementById('Layer_1'), 'diagram.png', { backgroundColor: 'white' })
+        }}>download</button>
+      </div>
     </div>
   )
 }

@@ -110,6 +110,7 @@ export const Default: Story = {
     marginTop: 0,
     marginBottom: 0,
     pollutant: 'PM10',
+    title: '2020년 부산광역시 PM-10 지역별 배출원별 상세 배출량',
     xAxisLabel: '연간 배출량 (ton)',
     data: data,
   },
