@@ -1,0 +1,227 @@
+[
+  {
+      "year": "2016",
+      "pollutant": "CO",
+      "value": 194990.03
+  },
+  {
+      "year": "2016",
+      "pollutant": "NOx",
+      "value": 369798.72
+  },
+  {
+      "year": "2016",
+      "pollutant": "SOx",
+      "value": 120129.24
+  },
+  {
+      "year": "2016",
+      "pollutant": "TSP",
+      "value": 79295.05
+  },
+  {
+      "year": "2016",
+      "pollutant": "PM10",
+      "value": 36896.28
+  },
+  {
+      "year": "2016",
+      "pollutant": "PM2P5",
+      "value": 18053.96
+  },
+  {
+      "year": "2016",
+      "pollutant": "VOC",
+      "value": 285792.69
+  },
+  {
+      "year": "2016",
+      "pollutant": "NH3",
+      "value": 40972.5
+  },
+  {
+      "year": "2016",
+      "pollutant": "BC",
+      "value": 3655.19
+  },
+  {
+      "year": "2017",
+      "pollutant": "CO",
+      "value": 191156.89
+  },
+  {
+      "year": "2017",
+      "pollutant": "NOx",
+      "value": 348539.38
+  },
+  {
+      "year": "2017",
+      "pollutant": "SOx",
+      "value": 110305.67
+  },
+  {
+      "year": "2017",
+      "pollutant": "TSP",
+      "value": 73610.46
+  },
+  {
+      "year": "2017",
+      "pollutant": "PM10",
+      "value": 32667.77
+  },
+  {
+      "year": "2017",
+      "pollutant": "PM2P5",
+      "value": 16185.5
+  },
+  {
+      "year": "2017",
+      "pollutant": "VOC",
+      "value": 276092.09
+  },
+  {
+      "year": "2017",
+      "pollutant": "NH3",
+      "value": 41756.38
+  },
+  {
+      "year": "2017",
+      "pollutant": "BC",
+      "value": 3241.82
+  },
+  {
+      "year": "2018",
+      "pollutant": "CO",
+      "value": 183247.64
+  },
+  {
+      "year": "2018",
+      "pollutant": "NOx",
+      "value": 328354.56
+  },
+  {
+      "year": "2018",
+      "pollutant": "SOx",
+      "value": 98988
+  },
+  {
+      "year": "2018",
+      "pollutant": "TSP",
+      "value": 74799.62
+  },
+  {
+      "year": "2018",
+      "pollutant": "PM10",
+      "value": 33184.52
+  },
+  {
+      "year": "2018",
+      "pollutant": "PM2P5",
+      "value": 16386.73
+  },
+  {
+      "year": "2018",
+      "pollutant": "VOC",
+      "value": 269438.5
+  },
+  {
+      "year": "2018",
+      "pollutant": "NH3",
+      "value": 41474.77
+  },
+  {
+      "year": "2018",
+      "pollutant": "BC",
+      "value": 3041.96
+  },
+  {
+      "year": "2019",
+      "pollutant": "CO",
+      "value": 126598.35
+  },
+  {
+      "year": "2019",
+      "pollutant": "NOx",
+      "value": 237501.63
+  },
+  {
+      "year": "2019",
+      "pollutant": "SOx",
+      "value": 97463.3
+  },
+  {
+      "year": "2019",
+      "pollutant": "TSP",
+      "value": 103086.83
+  },
+  {
+      "year": "2019",
+      "pollutant": "PM10",
+      "value": 48351.35
+  },
+  {
+      "year": "2019",
+      "pollutant": "PM2P5",
+      "value": 22882.65
+  },
+  {
+      "year": "2019",
+      "pollutant": "VOC",
+      "value": 237489.14
+  },
+  {
+      "year": "2019",
+      "pollutant": "NH3",
+      "value": 41925.94
+  },
+  {
+      "year": "2019",
+      "pollutant": "BC",
+      "value": 2445.35
+  },
+  {
+      "year": "2020",
+      "pollutant": "CO",
+      "value": 163475.52
+  },
+  {
+      "year": "2020",
+      "pollutant": "NOx",
+      "value": 278941.06
+  },
+  {
+      "year": "2020",
+      "pollutant": "SOx",
+      "value": 70672.77
+  },
+  {
+      "year": "2020",
+      "pollutant": "TSP",
+      "value": 71529.89
+  },
+  {
+      "year": "2020",
+      "pollutant": "PM10",
+      "value": 30033.05
+  },
+  {
+      "year": "2020",
+      "pollutant": "PM2P5",
+      "value": 14433.19
+  },
+  {
+      "year": "2020",
+      "pollutant": "VOC",
+      "value": 239555.27
+  },
+  {
+      "year": "2020",
+      "pollutant": "NH3",
+      "value": 37358.87
+  },
+  {
+      "year": "2020",
+      "pollutant": "BC",
+      "value": 2333.51
+  }
+]
