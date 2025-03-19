@@ -6,3 +6,6 @@ Unable to connect to VS Code server: Error in request - ENOENT /run/user/1000/vs
 
 답변
 https://github.com/microsoft/vscode/issues/157275#issuecomment-1890408573
+```
+loginctl enable-linger $(whoami)
+```
